@@ -4,20 +4,20 @@ validate_args(){
 EXPECTED_ARGS=2
 if [ $# -ne $EXPECTED_ARGS ]; then
     echo "Usage: $0 source_dir dest_dir"
-    exit 1
+    return 1
 fi
 
 for arg in "$@"
 do
     if [ ! -d "$arg" ]; then
         echo "Error: '$arg' is not a directory."
-        exit 1
+        return 1
     fi
 done
 
 if find $2 -mindepth 1 -maxdepth 1 | read; then
    echo "Destination dir is not empty"
-   exit 1
+   return 1
 fi
 
 }
@@ -45,6 +45,8 @@ done
 }
 
 
-#####MAIN#####
+#####MAIN#####  
+set +x
 validate_args $*
 populate_dest $*
+set -x 
