@@ -33,7 +33,7 @@ cd $SOURCE_DIR
 for DIR in $(find "."  -type d |  sed 's/^\.\///' )
 do
     echo "$DIR"
-    mkdir "$DEST_DIR"/DIR
+    mkdir "$DEST_DIR"/"$DIR"
 done
 
 #Deploying links
