@@ -15,39 +15,40 @@ do
     fi
 done
 
-if find $2 -mindepth 1 -maxdepth 1 | read; then 
-   echo "Destination dir is not empty"
-   return 1
-fi
-
 }
 
-populate_dest(){
+sync_dest(){
 OLD_PWD=$PWD
 SOURCE_DIR=$1
 DEST_DIR=$2
+LOGGING="0"
+cd "$SOURCE_DIR"
 OLD_IFS="$IFS"
 IFS=$'\n'
-#Deploying dir structure
-mkdir "$DEST_DIR"
-cd "$SOURCE_DIR"
-for DIR in $(find "."  -type d |  sed 's/^\.\///' )
-do
-    echo "$DIR"
-    mkdir "$DEST_DIR"/"$DIR"
-done
-
-#Deploying links
+#syncing files
     
 for f in $(find "." -type f |  sed 's/^\.\///' )
 do
-    echo creating link "$f"; ln -s "$SOURCE_DIR"/"$f" "$DEST_DIR"/"$f"
+    f_n="$f"".$RANDOM"
+    echo copying  "$f" to tmp file "$f_n"
+    cp "$SOURCE_DIR"/"$f" "$DEST_DIR"/"$f_n"
+    if [[ -L "$DEST_DIR"/"$f" ]]; then    
+        echo removing symlink "$DEST_DIR"/"$f"
+        rm "$DEST_DIR"/"$f"
+    fi
+    echo moving temp file where it belongs
+    mv "$DEST_DIR"/"$f_n" "$DEST_DIR"/"$f"
+
 done
-}
+
 IFS="$OLD_IFS"
+
+echo sync done.
+}   
+
 
 #####MAIN#####  
 set +x
 validate_args $*
-populate_dest $*            
+sync_dest $*
 set -x 
